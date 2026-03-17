@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScreenSmooth - Activate License</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #000;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            padding: 40px;
+            max-width: 480px;
+            width: 100%;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: #F55659;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .logo p {
+            color: #a0a0a0;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #d0d0d0;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            font-size: 14px;
+            color: #fff;
+            transition: all 0.3s ease;
+            font-family: monospace;
+        }
+
+        input[type="text"]::placeholder {
+            color: #666;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #F55659;
+            box-shadow: 0 0 0 3px rgba(245, 86, 89, 0.2);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-bottom: 12px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #F55659 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(245, 86, 89, 0.3);
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .status-message {
+            margin-top: 16px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .status-message.show {
+            display: block;
+        }
+
+        .status-message.error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .status-message.success {
+            background: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-message.info {
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .help-text {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .loader {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .subscription-status {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .subscription-status.show {
+            display: block;
+        }
+
+        .subscription-status .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .subscription-status .status-badge.active {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .subscription-status .status-badge.lifetime {
+            background: rgba(245, 86, 89, 0.2);
+            color: #F55659;
+        }
+
+        .subscription-status .status-badge.expired {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            color: #fff;
+            font-size: 16px;
+            margin-top: 20px;
+            text-decoration: none;
+            opacity: 1;
+        }
+
+        .back-link:hover {
+            color: #F55659;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>ScreenSmooth</h1>
+            <p>Activate Your License</p>
+        </div>
+
+        <!-- License Status (shown for existing license holders) -->
+        <div class="subscription-status" id="subscriptionStatus">
+            <p style="color: #a0a0a0; font-size: 13px; margin-bottom: 8px;">License Status</p>
+            <span class="status-badge" id="statusBadge">Active</span>
+            <p style="color: #d0d0d0; font-size: 14px; margin-top: 12px;" id="statusDetails"></p>
+        </div>
+
+        <!-- License Activation Form -->
+        <form id="licenseForm">
+            <div class="form-group">
+                <label for="licenseKey">Enter License Key</label>
+                <input type="text" id="licenseKey" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" required>
+                <div class="help-text">License keys are sent to your email after purchase</div>
+            </div>
+
+            <button type="submit" id="activateBtn" class="btn btn-primary">
+                Activate License
+            </button>
+        </form>
+
+        <div id="statusMessage" class="status-message"></div>
+
+        <a href="https://screensmooth.com" target="_blank" class="back-link">Buy License at screensmooth.com →</a>
+    </div>
+
+    <!-- Load scripts -->
+    <script src="license.js"></script>
+</body>
+</html>

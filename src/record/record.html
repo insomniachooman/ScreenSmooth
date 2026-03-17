@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ScreenSmooth - Record & Edit</title>
+  <link rel="stylesheet" href="record.css" />
+  <!-- Process polyfill and Debug logging -->
+  <script src="record-init.js"></script>
+
+  <!-- FFmpeg libraries for video conversion -->
+  <script src="../../assets/ffmpeg/ffmpeg.min.js"></script>
+
+  <!-- Strict License Gate: Visual Hiding -->
+  <style>
+    /* Hide everything by default until verified in license-gate.js */
+    html {
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    /* Class added by license-gate.js upon success */
+    html.license-verified {
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+  </style>
+
+  <!-- External License Gate Script (Runs immediately) -->
+  <script src="license-gate.js"></script>
+
+  <!-- Note: Users reach here only after passing license gate -->
+
+  <!-- Note: License system now uses DodoPayments only - no simple-license.js -->
+
+  <!-- ScreenSmoothRecorder will be initialized via DOMContentLoaded listener in record.js -->
+
+</head>
+
+<body>
+  <!-- REMOVED: Login Form - Using simple license system instead -->
+  <!-- <div id="loginView">
+    <h1>Welcome! Sign up or Log in</h1>
+    <form id="authForm">
+      <input type="email" id="email" placeholder="Enter your email" required>
+      <button type="submit" id="magicBtn">Continue with Magic Link</button>
+    </form>
+    <button id="googleBtn">Continue with Google</button>
+    <p id="status"></p>
+  </div> -->
+  <div id="dashboardView" style="display: block;">
+    <!-- REMOVED: User info and auth-based premium section -->
+    <!-- <div id="userInfo"></div> -->
+
+    <!-- Simple License Status Section - Commented out for shipping without trial -->
+    <!-- <div style="display: flex; align-items: center; gap: 10px; justify-content: center; margin-bottom: 20px;">
+      <div id="license-status" style="display: none;">
+        <span id="license-badge">⭐ Premium Active</span>
+      </div>
+      <button id="activate-license-btn" class="btn btn-secondary" style="background: #f59e0b; border: none; color: white; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,16.5L6.5,12L7.91,10.59L11,13.67L16.59,8.09L18,9.5L11,16.5Z"/>
+        </svg>
+        Activate License
+      </button>
+      <button id="upgrade-premium-btn" class="btn btn-primary" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+        Upgrade to Premium - $49 Lifetime
+      </button>
+      <button id="manage-license-btn" class="btn btn-secondary" style="display: none; background: #10b981; border: none; color: white; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+        </svg>
+        Manage License
+      </button>
+      <button id="start-trial-btn" class="btn btn-secondary" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border: none; color: white; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; display: none; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12,2L13.09,8.26L22,9L13.09,9.74L12,16L10.91,9.74L2,9L10.91,8.26L12,2M12,4.5L5,7L12,9.5L19,7L12,4.5M4.5,10L6,14L12,16L18,14L19.5,10L12,12.5L4.5,10Z"/>
+        </svg>
+        Start $1 Trial (14 days)
+      </button>
+    </div> -->
+    <div class="app-container">
+      <!-- Header -->
+      <!-- <header class="header">
+        <div class="logo">
+          <div class="logo-icon">
+            <div class="record-dot"></div>
+          </div>
+          <div class="brand-text">
+            <h1>ScreenSmooth</h1>
+            <p>Professional Screen Recording</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-secondary" id="settings-btn">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97c0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1c0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"
+              />
+            </svg>
+            Settings
+          </button>
+        </div>
+      </header> -->
+
+      <!-- Editor Layout -->
+      <div class="editor-layout">
+        <!-- Main Content -->
+        <main class="main-content no-recording">
+          <!-- Recording Setup Section -->
+          <section class="recording-setup" id="recording-setup">
+            <div class="setup-container">
+              <div class="setup-header">
+                <h2>Choose What to Record</h2>
+                <p>Select your recording source and configure settings</p>
+              </div>
+
+              <div class="recording-options">
+                <div class="option-card" data-type="tab">
+                  <div class="option-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z" />
+                    </svg>
+                  </div>
+                  <h3>Browser Tab <span class="recommended-tag">(Recommended)</span></h3>
+                  <p>Record current browser tab</p>
+                  <div class="option-badge">Best for Auto-Zoom</div>
+                </div>
+
+                <div class="option-card" data-type="screen">
+                  <div class="option-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M21,16H3V4H21M21,2H3C1.89,2 1,2.89 1,4V16A2,2 0 0,0 3,18H10V20H8V22H16V20H14V18H21A2,2 0 0,0 23,16V4C23,2.89 22.1,2 21,2Z" />
+                    </svg>
+                  </div>
+                  <h3>Entire Screen</h3>
+                  <p>Record everything on your screen</p>
+                </div>
+
+                <div class="option-card" data-type="window">
+                  <div class="option-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M4,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M4,6V18H20V6H4Z" />
+                    </svg>
+                  </div>
+                  <h3>Application Window</h3>
+                  <p>Record a specific application</p>
+                </div>
+              </div>
+
+              <!-- Mode Warning Box -->
+              <div class="mode-warning" id="mode-warning" style="display: none;">
+                <div class="warning-icon">⚠️</div>
+                <div class="warning-content">
+                  <strong>Auto-Zoom and Cursor Overlay are disabled</strong>
+                  <p>For best results, use Browser Tab recording</p>
+                </div>
+              </div>
+
+              <div class="recording-settings">
+                <div class="settings-group">
+                  <h4>Recording Quality</h4>
+                  <div class="quality-options">
+                    <label class="radio-option">
+                      <input type="radio" name="quality" value="high" checked />
+                      <span class="radio-custom"></span>
+                      <div class="option-info">
+                        <span class="option-title">High Quality</span>
+                        <span class="option-desc">1080p, 30fps</span>
+                      </div>
+                    </label>
+                    <label class="radio-option">
+                      <input type="radio" name="quality" value="medium" />
+                      <span class="radio-custom"></span>
+                      <div class="option-info">
+                        <span class="option-title">Medium Quality</span>
+                        <span class="option-desc">720p, 30fps</span>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="settings-group">
+                  <h4>Features</h4>
+                  <div class="feature-toggles">
+                    <label class="toggle-option">
+                      <input type="checkbox" id="cursor-tracking" checked />
+                      <span class="toggle-custom"></span>
+                      <div class="option-info">
+                        <span class="option-title">Cursor Tracking</span>
+                        <span class="option-desc">Highlight cursor movements</span>
+                      </div>
+                    </label>
+                    <label class="toggle-option">
+                      <input type="checkbox" id="system-audio" checked />
+                      <span class="toggle-custom"></span>
+                      <div class="option-info">
+                        <span class="option-title">System Audio</span>
+                        <span class="option-desc">Record system sounds</span>
+                      </div>
+                    </label>
+                    <label class="toggle-option">
+                      <input type="checkbox" id="auto-zoom" checked />
+                      <span class="toggle-custom"></span>
+                      <div class="option-info">
+                        <span class="option-title">Auto Zoom</span>
+                        <span class="option-desc">Create zoom segments from cursor activity</span>
+                      </div>
+                    </label>
+                    <label class="toggle-option">
+                      <input type="checkbox" id="show-cursor" checked />
+                      <span class="toggle-custom"></span>
+                      <div class="option-info">
+                        <span class="option-title">Show Cursor</span>
+                        <span class="option-desc">Display cursor overlay in recording</span>
+                        <code class="info-note">Blue tracking dot appears during recording for better cursor visibility</code>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="start-recording-section">
+                <button class="btn btn-primary btn-large" id="start-recording-btn">
+                  <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="12" r="10" />
+                  </svg>
+                  Start Recording
+                </button>
+              </div>
+
+              <!-- Subscription Management & Support Section -->
+              <div class="bottom-actions">
+                <p class="support-text">
+                  If you have any problem or feedback, reach us at
+                  <a href="mailto:screensmoothapp@gmail.com">screensmoothapp@gmail.com</a>
+                </p>
+                <div class="bottom-buttons">
+                  <a href="https://insigh.to/b/feedback--roadmap-screensmooth" target="_blank" rel="noopener noreferrer" class="feedback-link">
+                    <button class="feedback-btn">
+                      Give Feedback
+                    </button>
+                  </a>
+                  <button id="manage-subscription-btn-new" class="secondary-btn">
+                    Manage Payments/Subscription
+                  </button>
+                </div>
+              </div>
+
+              <!-- Changelog Section -->
+              <div class="changelog-section" id="changelog-section">
+                <div class="changelog-toggle" id="changelog-toggle">
+                  <h4>What's New</h4>
+                  <span class="changelog-arrow">›</span>
+                </div>
+                <div class="changelog-content" id="changelog-content">
+                  <div class="changelog-item">
+                    <div class="changelog-header">
+                      <span class="changelog-version">v0.4</span>
+                      <span class="changelog-date">Feb 2026</span>
+                    </div>
+                    <ul>
+                      <li class="changelog-feature">
+                        <div class="changelog-text-container">
+                          <span class="changelog-text"><strong>Fixed:</strong> Video Export Truncation Bug in record.js</span>
+                          <p class="changelog-description">Fixed a bug that caused exported videos to be truncated. The issue was in the video export logic in record.js.</p>
+                        </div>
+                      </li>
+                      <li class="changelog-feature">
+                        <div class="changelog-text-container">
+                          <span class="changelog-text"><strong>Feature:</strong> Progress Bar on Download Button</span>
+                          <p class="changelog-description">Visual progress indicator that shows export progress percentage while the video is being processed and exported.</p>
+                        </div>
+                        <div class="changelog-media">
+                          <div class="changelog-images-row">
+                            <img src="../../assets/changelog/v0.4-progressbar.png" alt="Progress Bar" class="changelog-image-small" />
+                            <video src="../../assets/changelog/v0.4-export-progress.mov" controls muted playsinline class="changelog-video"></video>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="changelog-feature">
+                        <div class="changelog-text-container">
+                          <span class="changelog-text"><strong>Added:</strong> Feedback button linking to roadmap & feedback portal</span>
+                          <p class="changelog-description">New feedback button that redirects users to a page where they can submit feedback and view the product roadmap.</p>
+                        </div>
+                        <div class="changelog-media">
+                          <div class="changelog-images-row">
+                            <img src="../../assets/changelog/v0.4-feedback-button.png" alt="Feedback Button" class="changelog-image-small" />
+                            <img src="../../assets/changelog/v0.4-roadmap-page.png" alt="Roadmap Page" class="changelog-image-small" />
+                          </div>
+                        </div>
+                      </li>
+                      <li class="changelog-feature">
+                        <div class="changelog-text-container">
+                          <span class="changelog-text"><strong>Added:</strong> Recording Mode Warning System - warns when non-tab mode is selected</span>
+                          <p class="changelog-description">Warns users that Auto-Zoom and Cursor Overlay only work in Browser Tab mode. Reordered recording options with Browser Tab now first (marked "Recommended"). Added warning box for "Entire Screen" or "Application Window" modes. Auto-Zoom and Show Cursor checkboxes get disabled when non-tab mode is selected. Default recording type changed from "screen" to "tab".</p>
+                        </div>
+                        <div class="changelog-media">
+                          <img src="../../assets/changelog/v0.4-recording-warning.png" alt="Recording Mode Warning" class="changelog-image" />
+                        </div>
+                      </li>
+                      <li class="changelog-feature">
+                        <div class="changelog-text-container">
+                          <span class="changelog-text"><strong>Added:</strong> Collapsible "What's New" changelog section</span>
+                          <p class="changelog-description">New collapsible section that displays version updates with media to users. Includes toggle arrow and version v0.4 with 4 bullet points.</p>
+                        </div>
+                        <div class="changelog-media">
+                          <img src="../../assets/changelog/v0.4-changelog-section.png" alt="Changelog Section" class="changelog-image" />
+                        </div>
+                      </li>
+                      <li class="changelog-feature">
+                        <div class="changelog-text-container">
+                          <span class="changelog-text"><strong>Changed:</strong> Zoom Intensity Default (2x → 1.5x) for subtler auto-zoom</span>
+                          <p class="changelog-description">Reduced default zoom intensity from 2x to 1.5x to make auto-zoom more subtle and natural by default.</p>
+                        </div>
+                        <div class="changelog-media">
+                          <img src="../../assets/changelog/v0.4-reduced-zoom-intensity.png" alt="Reduced Zoom Intensity" class="changelog-image" />
+                        </div>
+                      </li>
+                      <li class="changelog-feature">
+                        <div class="changelog-text-container">
+                          <span class="changelog-text"><strong>Changed:</strong> Animation Duration UI - replaced slider with segmented control</span>
+                          <p class="changelog-description">Changed animation duration control from slider to segmented control buttons (Rapid/Quick/Default/Slow). Replaces old cubic bezier easing with spring physics system.</p>
+                        </div>
+                        <div class="changelog-media">
+                          <img src="../../assets/changelog/v0.4-animation-duration-ui.png" alt="Animation Duration UI" class="changelog-image" />
+                        </div>
+                      </li>
+                      <li class="changelog-feature">
+                        <div class="changelog-text-container">
+                          <span class="changelog-text"><strong>New:</strong> Spring Physics System - smoother, more natural animations</span>
+                          <p class="changelog-description">Added createSpring(), ensureZoomSprings(), and ensureCursorSprings() methods. Replaces transition-based animation with stateful spring physics (position + velocity) for smoother, more natural "Screen Studio-like" animation.</p>
+                        </div>
+                      </li>
+                      <li class="changelog-feature">
+                        <div class="changelog-text-container">
+                          <span class="changelog-text"><strong>Bug Fixes:</strong> Fixed zoom jitter, added spring snapping on seek</span>
+                          <p class="changelog-description">Fixed zoom jitter by removing duplicate getZoomStateAtTime calls per frame. Added spring snapping on seek to prevent cursor "flyback". Uses currentZoomState directly instead of recalculating.</p>
+                        </div>
+                      </li>
+                      <li class="changelog-feature">
+                        <div class="changelog-text-container">
+                          <span class="changelog-text"><strong>Changed:</strong> Real-time Zoom disabled - auto-zoom now works post-recording only</span>
+                          <p class="changelog-description">useRealtimeZoom is now always false - auto-zoom only works post-recording for better performance and reliability.</p>
+                        </div>
+                      </li>
+                      <li class="changelog-feature">
+                        <div class="changelog-text-container">
+                          <span class="changelog-text"><strong>New:</strong> Post-recording Auto-zoom - captures clicks during recording and generates zoom segments after</span>
+                          <p class="changelog-description">Added autoZoomClickEvents array to capture clicks during recording. Generates zoom segments from clicks after recording stops.</p>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Recording Controls Section -->
+          <section class="recording-controls" id="recording-controls" style="display: none">
+            <div class="controls-container">
+                <div class="status-indicator">
+                  <div class="status-dot recording"></div>
+                  <span class="status-text">Recording in Progress</span>
+                </div>
+                <div class="recording-indicator-large">
+                  <div class="pulsing-dot-large"></div>
+                  <span class="recording-text-large">RECORDING</span>
+                </div>
+                <div class="timer-display">
+                  <span class="timer" id="recording-timer">00:00:00</span>
+                </div>
+              </div>
+
+              <div class="control-buttons">
+                <button class="btn btn-secondary" id="pause-recording-btn">
+                  <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="6" y="4" width="4" height="16" />
+                    <rect x="14" y="4" width="4" height="16" />
+                  </svg>
+                  Pause
+                </button>
+                <button class="btn btn-danger btn-large" id="stop-recording-btn">
+                  <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="6" y="6" width="12" height="12" />
+                  </svg>
+                  Stop Recording
+                </button>
+              </div>
+
+              <div class="recording-info">
+                <p>
+                  Recording your screen... Click "Stop Recording" when finished.
+                </p>
+                <p class="tip">
+                  💡 Tip: The recording will automatically stop if you close the
+                  screen sharing.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Countdown Overlay -->
+          <div id="countdown-overlay" class="countdown-overlay" style="display: none;">
+            <div class="countdown-number">3</div>
+            <div class="countdown-text">Starting Recording...</div>
+          </div>
+
+          <!-- Preview & Editor Section -->
+          <section class="preview-editor" id="preview-editor">
+            <!-- Editor Panels Container -->
+            <div class="editor-panels-container">
+              <!-- Sidebar Navigation -->
+              <nav class="sidebar" id="sidebar">
+                <button class="sidebar-btn active" data-panel="background-panel">
+                  <svg class="sidebar-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                      d="M9,11H15L13,9L11.5,10.5L10.5,9.5L9,11M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
+                  </svg>
+                  <span>Background</span>
+                </button>
+                <button class="sidebar-btn" data-panel="screen-panel">
+                  <svg class="sidebar-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                      d="M21,16H3V4H21M21,2H3C1.89,2 1,2.89 1,4V16A2,2 0 0,0 3,18H10V20H8V22H16V20H14V18H21A2,2 0 0,0 23,16V4C23,2.89 22.1,2 21,2Z" />
+                  </svg>
+                  <span>Screen</span>
+                </button>
+                <button class="sidebar-btn" data-panel="animation-physics-panel">
+                  <svg class="sidebar-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                      d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.98C19.47,12.66 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11.02L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11.02C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.66 4.57,12.98L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.98Z" />
+                  </svg>
+                  <span>Animation Physics</span>
+                </button>
+                <button class="sidebar-btn" data-panel="cursor-panel">
+                  <svg class="sidebar-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                      d="M13.64,21.97C13.14,22.21 12.54,22 12.31,21.5L10.13,16.76L7.62,18.78C7.45,18.92 7.24,19 7,19A1,1 0 0,1 6,18V3A1,1 0 0,1 7,2C7.24,2 7.47,2.09 7.64,2.23L7.65,2.22L19.14,11.86C19.57,12.22 19.62,12.85 19.27,13.27C19.12,13.45 18.91,13.57 18.7,13.61L15.54,14.23L17.68,18.58C17.92,19.08 17.71,19.68 17.21,19.92L13.64,21.97Z" />
+                  </svg>
+                  <span>Cursor</span>
+                </button>
+                <button class="sidebar-btn" data-panel="zoom-panel">
+                  <svg class="sidebar-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                      d="M15.5,14H14.71L14.43,13.73C15.41,12.59 16,11.11 16,9.5A6.5,6.5 0 0,0 9.5,3A6.5,6.5 0 0,0 3,9.5A6.5,6.5 0 0,0 9.5,16C11.11,16 12.59,15.41 13.73,14.43L14,14.71V15.5L19,20.49L20.49,19L15.5,14M9.5,14C7,14 5,12 5,9.5C5,7 7,5 9.5,5C12,5 14,7 14,9.5C14,12 12,14 9.5,14Z" />
+                  </svg>
+                  <span>Zoom</span>
+                </button>
+                <button class="sidebar-btn" data-panel="others-panel">
+                  <svg class="sidebar-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                      d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.98C19.47,12.66 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11.02L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11.02C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.66 4.57,12.98L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.98Z" />
+                  </svg>
+                  <span>Others</span>
+                </button>
+              </nav>
+
+              <!-- Editor Panels -->
+              <div class="editor-panels-content">
+                <!-- Background Panel -->
+                <div class="editor-panel active" id="background-panel" style="display: block">
+                  <div class="background-controls">
+                    <button class="btn-random-wallpaper" id="random-wallpaper-btn">
+                      <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                          d="M12 5V1L7 6l5 5V7a6 6 0 0 1 6 6 6 6 0 0 1-6 6 6 6 0 0 1-6-6H4a8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8z" />
+                      </svg>
+                      Pick Random Wallpaper
+                    </button>
+                  </div>
+
+                  <div class="wallpaper-grid" id="wallpaper-grid">
+                    <!-- Wallpapers will be dynamically inserted here -->
+                  </div>
+
+                  <div class="visual-effects-controls">
+                    <div class="control-group">
+                      <label for="aspect-ratio-select">Aspect Ratio</label>
+                      <select id="aspect-ratio-select">
+                        <option value="native">Native</option>
+                        <option value="21:9">21:9 (Ultrawide)</option>
+                        <option value="16:9">16:9 (Widescreen)</option>
+                        <option value="16:10">16:10</option>
+                        <option value="3:2">3:2</option>
+                        <option value="4:3">4:3 (Standard)</option>
+                        <option value="1:1">1:1 (Square)</option>
+                        <option value="3:4">3:4 (Portrait)</option>
+                        <option value="2:3">2:3</option>
+                        <option value="10:16">10:16</option>
+                        <option value="9:16">9:16 (Vertical)</option>
+                      </select>
+                    </div>
+                    <div class="control-slider">
+                      <div class="slider-label">
+                        <svg class="slider-icon" viewBox="0 0 24 24" fill="currentColor">
+                          <path
+                            d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM4 18V6h16v12H4z" />
+                        </svg>
+                        <span>Padding</span>
+                      </div>
+                      <div class="slider-container">
+                        <input type="range" id="video-padding" min="0" max="100" value="8" step="1" />
+                        <span class="slider-value" id="padding-value">8px</span>
+                      </div>
+                    </div>
+                    <div class="control-slider">
+                      <div class="slider-label">
+                        <svg class="slider-icon" viewBox="0 0 24 24" fill="currentColor">
+                          <path
+                            d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm0 2v12h16V6H4z" />
+                        </svg>
+                        <span>Border Radius</span>
+                      </div>
+                      <div class="slider-container">
+                        <input type="range" id="video-border-radius" min="0" max="50" value="12" step="1" />
+                        <span class="slider-value" id="border-radius-value">12px</span>
+                      </div>
+                    </div>
+                    <div class="control-slider">
+                      <div class="slider-label">
+                        <svg class="slider-icon" viewBox="0 0 24 24" fill="currentColor">
+                          <path
+                            d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                        </svg>
+                        <span>Blur</span>
+                      </div>
+                      <div class="slider-container">
+                        <input type="range" id="video-blur" min="0" max="10" value="0" step="0.1" />
+                        <span class="slider-value" id="blur-value">0px</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Screen Panel -->
+                <div class="editor-panel" id="screen-panel" style="display: none">
+                  <h4>Screen Settings</h4>
+                  <div class="editing-controls">
+                    <div class="control-group">
+                      <label for="screen-brightness">Brightness</label>
+                      <input type="range" id="screen-brightness" min="0" max="2" value="1" step="0.1" />
+                      <span class="range-value" id="brightness-value">100%</span>
+                    </div>
+                    <div class="control-group">
+                      <label for="screen-contrast">Contrast</label>
+                      <input type="range" id="screen-contrast" min="0" max="2" value="1" step="0.1" />
+                      <span class="range-value" id="contrast-value">100%</span>
+                    </div>
+                    <div class="control-group">
+                      <label for="screen-saturation">Saturation</label>
+                      <input type="range" id="screen-saturation" min="0" max="2" value="1" step="0.1" />
+                      <span class="range-value" id="saturation-value">100%</span>
+                    </div>
+                  </div>
+                  <div class="editing-info">
+                    <p class="info-text">
+                      🎨 Adjust screen appearance and color properties.
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Animation Physics Panel -->
+                <div class="editor-panel" id="animation-physics-panel" style="display: none">
+                  <h4>Animation & Physics</h4>
+                  <div class="editing-controls">
+                    <div class="control-group">
+                      <label for="zoom-speed">Zoom Speed</label>
+                      <input type="range" id="zoom-speed" min="0.1" max="3" value="1" step="0.1" />
+                      <span class="range-value" id="zoom-speed-value">1x</span>
+                    </div>
+                    <div class="control-group">
+                      <label for="cursor-animation">Cursor Animation</label>
+                      <select id="cursor-animation">
+                        <option value="none">None</option>
+                        <option value="bounce">Bounce</option>
+                        <option value="pulse">Pulse</option>
+                        <option value="glow">Glow</option>
+                      </select>
+                    </div>
+                    <div class="control-group">
+                      <label for="transition-easing">Transition Easing</label>
+                      <select id="transition-easing">
+                        <option value="linear">Linear</option>
+                        <option value="ease">Ease</option>
+                        <option value="ease-in">Ease In</option>
+                        <option value="ease-out">Ease Out</option>
+                        <option value="bounce">Bounce</option>
+                      </select>
+                    </div>
+                  </div>
+
+
+                  <div class="editing-info">
+                    <p class="info-text">
+                      ⚡ Configure smooth animations and transitions.
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Cursor Panel -->
+                <div class="editor-panel" id="cursor-panel" style="display: none">
+                  <h3>Cursor Settings</h3>
+
+                  <div class="setting-group">
+                    <label>Cursor Size</label>
+                    <input type="range" id="cursor-size" min="0.5" max="3" step="0.1" value="1">
+                    <span id="size-value">1.0x</span>
+                  </div>
+
+                  <div class="setting-group">
+                    <label for="cursor-style">Cursor Style</label>
+                    <select id="cursor-style" class="cursor-style-select">
+                      <option value="classic">Classic</option>
+                      <option value="minimal_dot">Minimal Dot</option>
+                      <option value="soft_glow">Soft Glow</option>
+                      <option value="high_contrast">High Contrast</option>
+                    </select>
+                  </div>
+
+                  <div class="setting-group">
+                    <label>Cursor Smoothness</label>
+                    <style>
+                      .segmented-control {
+                        display: flex;
+                        background: #1e1e1e;
+                        padding: 3px;
+                        border-radius: 8px;
+                        gap: 2px;
+                      }
+
+                      .segment-btn {
+                        flex: 1;
+                        background: transparent;
+                        border: none;
+                        color: #888;
+                        padding: 6px 4px;
+                        font-size: 12px;
+                        font-weight: 500;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                      }
+
+                      .segment-btn:hover {
+                        color: #fff;
+                        background: rgba(255, 255, 255, 0.05);
+                      }
+
+                      .segment-btn.active {
+                        background: #333;
+                        color: #fff;
+                        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+                      }
+                    </style>
+                    <div class="segmented-control" id="cursor-smoothness-control">
+                      <button class="segment-btn" data-value="0.3">Rapid</button>
+                      <button class="segment-btn" data-value="0.15">Quick</button>
+                      <button class="segment-btn active" data-value="0.08">Default</button>
+                      <button class="segment-btn" data-value="0.03">Slow</button>
+                    </div>
+                  </div>
+
+                  <div class="setting-group">
+                    <label class="toggle-option">
+                      <input type="checkbox" id="hide-idle">
+                      <span class="toggle-custom"></span>
+                      <div class="option-info">
+                        <span class="option-title">Hide when not moving</span>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div class="preview">
+                    <p>Preview:</p>
+                    <div id="cursor-preview"></div>
+                  </div>
+                </div>
+
+                <!-- Zoom Panel -->
+                <div class="editor-panel" id="zoom-panel" style="display: none">
+                  <h4>Zoom Controls</h4>
+                  <div class="editing-controls">
+                    <!-- No zoom selected message -->
+                    <div class="no-zoom-message" id="no-zoom-message">
+                      <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="currentColor" class="empty-icon">
+                          <path
+                            d="M15.5,14H14.71L14.43,13.73C15.41,12.59 16,11.11 16,9.5A6.5,6.5 0 0,0 9.5,3A6.5,6.5 0 0,0 3,9.5A6.5,6.5 0 0,0 9.5,16C11.11,16 12.59,15.41 13.73,14.43L14,14.71V15.5L19,20.49L20.49,19L15.5,14M9.5,14C7,14 5,12 5,9.5C5,7 7,5 9.5,5C12,5 14,7 14,9.5C14,12 12,14 9.5,14Z" />
+                        </svg>
+                        <h3>No Zoom Selected</h3>
+                        <p>Click on the zoom timeline below to add a zoom segment and edit it here.</p>
+                      </div>
+                    </div>
+
+                    <!-- Zoom editing controls (hidden by default) -->
+                    <div class="editing-controls zoom-editing-controls" id="zoom-editing-controls"
+                      style="display: none;">
+                      <div class="zoom-info" id="zoom-info">
+                        <h5>Editing Zoom Segment</h5>
+                        <p class="zoom-timing" id="zoom-timing">Duration: 3.0s</p>
+                      </div>
+
+                      <div class="control-group">
+                        <label>Zoom Mode</label>
+                        <div class="radio-group">
+                          <label class="radio-option">
+                            <input type="radio" name="zoom-mode" value="auto" checked />
+                            <span class="radio-custom"></span>
+                            <div class="option-info">
+                              <span class="option-title">Auto Zoom</span>
+                              <span class="option-desc">Follows cursor movement</span>
+                            </div>
+                          </label>
+                          <label class="radio-option">
+                            <input type="radio" name="zoom-mode" value="manual" />
+                            <span class="radio-custom"></span>
+                            <div class="option-info">
+                              <span class="option-title">Manual Zoom</span>
+                              <span class="option-desc">Custom position & timing</span>
+                            </div>
+                          </label>
+                        </div>
+                      </div>
+                      <div class="control-group">
+                        <label for="zoom-intensity">Zoom Intensity</label>
+                        <input type="range" id="zoom-intensity" min="1.25" max="4" value="1.5" step="0.25" />
+                        <span class="range-value" id="zoom-intensity-value">1.5x</span>
+                      </div>
+                      <div class="control-group">
+                        <label>Animation Duration</label>
+                        <div class="segmented-control zoom-anim-preset" id="zoom-anim-duration">
+                          <button class="segment-btn" data-value="rapid">Rapid</button>
+                          <button class="segment-btn" data-value="quick">Quick</button>
+                          <button class="segment-btn active" data-value="default">Default</button>
+                          <button class="segment-btn" data-value="slow">Slow</button>
+                        </div>
+                      </div>
+                      <div class="control-group manual-zoom-controls" style="display: none;">
+                        <label>Zoom Position</label>
+                        <div class="zoom-position-selector">
+                          <div class="position-preview" id="zoom-position-preview">
+                            <div class="position-indicator" id="zoom-position-indicator"></div>
+                          </div>
+                          <p class="info-text">Click on the preview to set zoom position</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="editing-info">
+                    <p class="info-text">
+                      🔍 Click on the timeline to add zoom segments or configure default zoom settings.
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Others Panel (Export & Advanced) -->
+                <div class="editor-panel" id="others-panel" style="display: none">
+                  <h4>Export & Advanced</h4>
+                  <div class="editing-controls">
+                    <div class="control-group">
+                      <label for="format-select">Format</label>
+                      <select id="format-select" class="format-selector">
+                        <option value="webm">WebM (Recommended)</option>
+                        <option value="mp4">MP4</option>
+                        <option value="gif">GIF</option>
+                      </select>
+                    </div>
+                    <div class="control-group">
+                      <label for="quality-select">Quality</label>
+                      <select id="quality-select" class="quality-selector">
+                        <option value="high">High Quality</option>
+                        <option value="medium">Medium Quality</option>
+                        <option value="low">Low Quality</option>
+                      </select>
+                    </div>
+                    <div class="control-group">
+                      <label for="compression-level">Compression</label>
+                      <input type="range" id="compression-level" min="1" max="10" value="5" step="1" />
+                      <span class="range-value" id="compression-value">5</span>
+                    </div>
+                  </div>
+                  <div class="editing-info">
+                    <p class="info-text">
+                      🔧 Advanced export settings and compression options.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Editor Container -->
+            <div class="editor-container">
+              <!-- <div class="editor-header">
+                <h2>Your Recording</h2>
+                <p>Preview and edit your screen recording</p>
+                <div id="status-text" class="status-text" style="display: none;"></div>
+              </div> -->
+
+              <canvas id="preview-canvas" class="preview-canvas"></canvas>
+              <div class="video-preview">
+                <div class="video-wrapper" id="video-wrapper" style="display: none;">
+                  <video id="preview-video" controls style="display: none;">
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+
+                <!-- Custom Video Player Controls -->
+                <div class="video-player-controls" id="video-player-controls">
+                  <div class="player-controls-left">
+                    <button class="player-btn" id="play-pause-btn">
+                      <svg class="player-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="5,3 19,12 5,21" />
+                      </svg>
+                    </button>
+                    <button class="player-btn" id="rewind-btn">
+                      <svg class="player-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M11.5,12L20,18V6M11,18V6L2.5,12L11,18Z" />
+                      </svg>
+                    </button>
+                    <button class="player-btn" id="forward-btn">
+                      <svg class="player-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M13,6V18L21.5,12M4,18L12.5,12L4,6V18Z" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div class="player-controls-center">
+                    <span class="time-display" id="current-time">00:00</span>
+                    <div class="progress-bar-container" id="progress-bar-container">
+                      <div class="progress-bar" id="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                        <div class="progress-handle" id="progress-handle"></div>
+                      </div>
+                    </div>
+                    <span class="time-display" id="total-time">00:00</span>
+                  </div>
+
+                  <div class="player-controls-right">
+                    <button class="player-btn" id="volume-btn">
+                      <svg class="player-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                          d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18.01,19.86 21,16.28 21,12C21,7.72 18.01,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.76 16.5,12M3,9V15H7L12,20V4L7,9H3Z" />
+                      </svg>
+                    </button>
+                    <button class="player-btn" id="fullscreen-btn">
+                      <svg class="player-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                          d="M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17V19H5V14H7V17H10Z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="video-info" id="video-info">
+                  <span class="file-name" id="file-name">recording.webm</span>
+                  <span class="file-size" id="file-size">0 MB</span>
+                  <span class="duration" id="video-duration">00:00</span>
+                </div>
+              </div>
+
+              <!-- Timeline Section -->
+              <div class="timeline-section">
+                <h4>Timeline Editor</h4>
+                <div class="timeline-container">
+                  <div class="timeline-markers" id="timeline-markers"></div>
+                  <div class="timeline-track" id="timeline-track">
+                    <div class="selected-range-overlay" id="selected-range-overlay"></div>
+                    <div class="trim-handle trim-handle-left" id="trim-handle-left">
+                      <div class="handle-grip"></div>
+                    </div>
+                    <div class="trim-handle trim-handle-right" id="trim-handle-right">
+                      <div class="handle-grip"></div>
+                    </div>
+                    <div class="playback-indicator" id="playback-indicator"></div>
+                  </div>
+
+                  <!-- Zoom Timeline -->
+                  <div class="zoom-timeline">
+                    <div class="track-header">
+                      <span class="track-label">Zoom</span>
+                      <div class="zoom-controls">
+                        <!-- Commented out zoom controls as requested -->
+                        <!-- <button class="add-zoom-btn" id="add-zoom-btn" title="Add Zoom Point">
+                          <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+                          </svg>
+                        </button> -->
+                        <button class="clear-zoom-btn" id="clear-zoom-btn" title="Clear All Zoom Segments">
+                          <!-- <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />
+                          </svg> -->
+                          Clear
+                        </button>
+                      </div>
+                    </div>
+                    <div class="zoom-track" id="zoom-track">
+                      <div class="zoom-hover-indicator" id="zoom-hover-indicator"></div>
+                      <div class="zoom-time-preview" id="zoom-time-preview">00:00</div>
+                      <div class="zoom-placeholder" id="zoom-placeholder">3.0s</div>
+                      <!-- Zoom segments will be added here dynamically -->
+                    </div>
+                  </div>
+
+                  <div class="zooms-track" id="zooms-track">
+                    <span class="track-label">Audio</span>
+                  </div>
+                  <div class="selected-duration-display" id="selected-duration-display">
+                    Selected: <span id="selected-duration-text">00:00</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="editor-actions">
+                <button class="btn btn-secondary" id="record-again-btn">
+                  <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                      d="M12,5V1L7,6L12,11V7A6,6 0 0,1 18,13A6,6 0 0,1 12,19A6,6 0 0,1 6,13H4A8,8 0 0,0 12,21A8,8 0 0,0 20,13A8,8 0 0,0 12,5Z" />
+                  </svg>
+                  Record Again
+                </button>
+                <button class="btn btn-primary" id="download-btn">
+                  <div class="btn-progress-bar" id="download-progress"></div>
+                  <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z" />
+                  </svg>
+                  <span class="btn-text">Download Recording</span>
+                </button>
+                <button class="btn btn-success" id="share-btn">
+                  <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                      d="M18,16.08C17.24,16.08 16.56,16.38 16.04,16.85L8.91,12.7C8.96,12.47 9,12.24 9,12C9,11.76 8.96,11.53 8.91,11.3L15.96,7.19C16.5,7.69 17.21,8 18,8A3,3 0 0,0 21,5A3,3 0 0,0 18,2A3,3 0 0,0 15,5C15,5.24 15.04,5.47 15.09,5.7L8.04,9.81C7.5,9.31 6.79,9 6,9A3,3 0 0,0 3,12A3,3 0 0,0 6,15C6.79,15 7.5,14.69 8.04,14.19L15.16,18.34C15.11,18.55 15.08,18.77 15.08,19C15.08,20.61 16.39,21.91 18,21.91C19.61,21.91 20.92,20.61 20.92,19A2.92,2.92 0 0,0 18,16.08Z" />
+                  </svg>
+                  Share
+                </button>
+              </div>
+
+              <!-- Video Demo & Timeline Panel - Integrated -->
+            </div>
+
+            <!-- Right Sidebar (New) -->
+            <div class="right-sidebar" id="right-sidebar">
+              <!-- Download Button (Always visible) -->
+              <div class="download-section">
+                <button class="btn btn-primary btn-download-sidebar" id="download-btn-right">
+                  <div class="btn-progress-bar" id="download-progress-right"></div>
+                  <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z" />
+                  </svg>
+                  <span class="btn-text">Download Recording</span>
+                </button>
+              </div>
+
+              <!-- Dynamic Content Area -->
+              <div class="right-sidebar-content" id="right-sidebar-content">
+                <!-- Export & Advanced Panel (Default) -->
+                <div class="editor-panel active" id="export-advanced-panel">
+                  <h4>Export & Advanced</h4>
+                  <div class="editing-controls">
+                    <div class="control-group">
+                      <label for="format-select-right">Format</label>
+                      <select id="format-select-right" class="format-selector">
+                        <option value="webm">WebM (Recommended)</option>
+                        <option value="mp4">MP4</option>
+                        <option value="gif">GIF</option>
+                      </select>
+                    </div>
+                    <div class="control-group">
+                      <label for="quality-select-right">Quality</label>
+                      <select id="quality-select-right" class="quality-selector">
+                        <option value="high">High Quality</option>
+                        <option value="medium">Medium Quality</option>
+                        <option value="low">Low Quality</option>
+                      </select>
+                    </div>
+                    <div class="control-group">
+                      <label for="compression-level-right">Compression</label>
+                      <input type="range" id="compression-level-right" min="1" max="10" value="5" step="1" />
+                      <span class="range-value" id="compression-value-right">5</span>
+                    </div>
+                  </div>
+                  <div class="editing-info">
+                    <p class="info-text">
+                      🔧 Advanced export settings and compression options.
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Zoom Controls Panel (Hidden by default) -->
+                <div class="editor-panel" id="zoom-controls-panel" style="display: none;">
+                  <div class="panel-header">
+                    <h4>Zoom Controls</h4>
+                    <button class="close-btn" id="close-zoom-controls">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                          d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <!-- No zoom selected message -->
+                  <div class="no-zoom-message" id="no-zoom-message-right">
+                    <div class="empty-state">
+                      <svg viewBox="0 0 24 24" fill="currentColor" class="empty-icon">
+                        <path
+                          d="M15.5,14H14.71L14.43,13.73C15.41,12.59 16,11.11 16,9.5A6.5,6.5 0 0,0 9.5,3A6.5,6.5 0 0,0 3,9.5A6.5,6.5 0 0,0 9.5,16C11.11,16 12.59,15.41 13.73,14.43L14,14.71V15.5L19,20.49L20.49,19L15.5,14M9.5,14C7,14 5,12 5,9.5C5,7 7,5 9.5,5C12,5 14,7 14,9.5C14,12 12,14 9.5,14Z" />
+                      </svg>
+                      <h3>No Zoom Selected</h3>
+                      <p>Click on the zoom timeline below to add a zoom segment and edit it here.</p>
+                    </div>
+                  </div>
+
+                  <!-- Zoom editing controls (hidden by default) -->
+                  <div class="editing-controls" id="zoom-editing-controls-right" style="display: none;">
+                    <div class="zoom-info" id="zoom-info-right">
+                      <h5>Editing Zoom Segment</h5>
+                      <p class="zoom-timing" id="zoom-timing-right">Duration: 3.0s</p>
+                    </div>
+
+                    <div class="control-group">
+                      <label>Zoom Mode</label>
+                      <div class="radio-group">
+                        <label class="radio-option">
+                          <input type="radio" name="zoom-mode-right" value="auto" checked />
+                          <span class="radio-custom"></span>
+                          <div class="option-info">
+                            <span class="option-title">Auto Zoom</span>
+                            <span class="option-desc">Follows cursor movement</span>
+                          </div>
+                        </label>
+                        <label class="radio-option">
+                          <input type="radio" name="zoom-mode-right" value="manual" />
+                          <span class="radio-custom"></span>
+                          <div class="option-info">
+                            <span class="option-title">Manual Zoom</span>
+                            <span class="option-desc">Custom position & timing</span>
+                          </div>
+                        </label>
+                      </div>
+                    </div>
+                    <div class="control-group">
+                      <label for="zoom-intensity-right">Zoom Intensity</label>
+                      <input type="range" id="zoom-intensity-right" min="1.25" max="4" value="1.5" step="0.25" />
+                      <span class="range-value" id="zoom-intensity-value-right">1.5x</span>
+                    </div>
+                    <div class="control-group">
+                      <label>Animation Duration</label>
+                      <div class="segmented-control zoom-anim-preset" id="zoom-anim-duration-right">
+                        <button class="segment-btn" data-value="rapid">Rapid</button>
+                        <button class="segment-btn" data-value="quick">Quick</button>
+                        <button class="segment-btn active" data-value="default">Default</button>
+                        <button class="segment-btn" data-value="slow">Slow</button>
+                      </div>
+                    </div>
+                    <div class="control-group manual-zoom-controls" style="display: none;">
+                      <label>Zoom Position</label>
+                      <div class="zoom-position-selector">
+                        <div class="position-preview" id="zoom-position-preview-right">
+                          <div class="position-indicator" id="zoom-position-indicator-right"></div>
+                        </div>
+                        <p class="info-text">Click on the preview to set zoom position</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="editing-info">
+                    <p class="info-text">
+                      🔍 Click on the timeline to add zoom segments.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <div id="status-text"></div>
+  </div>
+
+  <!-- Load cursor settings and recording initialization -->
+  <script type="module" src="cursor-settings.js"></script>
+  <script src="record-init.js"></script>
+  <script type="module" src="record.js"></script>
+  <!-- Note: License validation is done via simple gate in <head> - redirects to landingpage.html if invalid -->
+</body>
+
+</html>

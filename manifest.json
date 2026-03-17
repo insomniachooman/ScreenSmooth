@@ -1,0 +1,32 @@
+{
+   "action": {
+      "default_title": "ScreenSmooth"
+   },
+   "background": {
+      "service_worker": "src/background.js"
+   },
+   "content_scripts": [ {
+      "js": [ "src/content.js" ],
+      "matches": [ "\u003Call_urls>" ],
+      "run_at": "document_start"
+   } ],
+   "content_security_policy": {
+      "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; connect-src 'self' https://*.supabase.co https://*.dodopayments.com;"
+   },
+   "description": "ScreenSmooth creates beautiful screen recordings with automatic zooms, pans, and smooth cursor by AI that keep the viewer engaged.",
+   "host_permissions": [ "\u003Call_urls>" ],
+   "icons": {
+      "128": "assets/icons/icon48.png",
+      "16": "assets/icons/icon16.png",
+      "48": "assets/icons/icon48.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvhYuTa4l5jVRxuv1rS5+5Xrmv6otsluAOtmEIHNPm/1PJ0UvsbPcGK7gNXPL30SFsWuP9aF3NQ/BCvioCDk19hyELEOXzy6jxNzqMJms/OCp0S1CJMl0DvjvDAlYOLL1KOTAGT6FtNKmsyJMnOchJUxvWH8DRZmY+HZK9sC61fN3JP8Hbnq6k168zduqevBnOQYwy8pykej+KKMHZnflV6Sn1iPMNto+fm8X0kP5ZjT8sEdWuALHczEe9M4sRROrgOhDsOBVAnLkr23H0G+yek+NceNWK92ZhgH14/WdrEKJ2cbU3hHz2aTdwqyr9hxTE8NLw2qya7B3ce8EsDi8XwIDAQAB",
+   "manifest_version": 3,
+   "name": "ScreenSmooth - Screen Recorder with AI Auto Zoom",
+   "permissions": [ "activeTab", "storage", "scripting" ],
+   "version": "0.4.0",
+   "web_accessible_resources": [ {
+      "matches": [ "\u003Call_urls>" ],
+      "resources": [ "src/record/record.html", "src/record/record.css", "src/record/record.js", "src/record/record-init.js", "src/record/license-gate.js", "src/popup/popup.html", "src/popup/popup.css", "src/popup/popup.js", "src/license/license.html", "src/license/license.js", "src/landingpage.js", "src/lemonsqueezy-checkout.js", "src/styles.css", "assets/ffmpeg/ffmpeg-core.js", "assets/ffmpeg/ffmpeg-core.wasm", "assets/ffmpeg/ffmpeg-core.worker.js", "assets/ffmpeg/ffmpeg-core-st.js", "assets/ffmpeg/ffmpeg-core-st.wasm", "assets/ffmpeg/ffmpeg.min.js", "assets/ffmpeg/util.min.js", "assets/ffmpeg/814.ffmpeg.js", "assets/bg/*.png", "src/lemon.js" ]
+   } ]
+}
