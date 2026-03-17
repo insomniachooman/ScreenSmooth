@@ -234,16 +234,25 @@ export class CursorProcessor {
     drawStyledCursorShape(ctx, cursorStyle, size) {
         switch (cursorStyle) {
             case 'minimal_dot': {
+                // Sleek, modern dot with subtle drop shadow and semi-transparent ring
                 const centerX = size * 0.2;
                 const centerY = size * 0.2;
-                const outerRadius = Math.max(5, size * 0.14);
-                const innerRadius = outerRadius * 0.45;
+                const outerRadius = Math.max(6, size * 0.18);
+                const innerRadius = outerRadius * 0.4;
 
-                ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+                // Outer semi-transparent ring
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, outerRadius + 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Dark outline
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
                 ctx.beginPath();
                 ctx.arc(centerX, centerY, outerRadius, 0, Math.PI * 2);
                 ctx.fill();
 
+                // Inner bright dot
                 ctx.fillStyle = '#ffffff';
                 ctx.beginPath();
                 ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
@@ -252,20 +261,25 @@ export class CursorProcessor {
             }
 
             case 'soft_glow': {
+                // Ethereal macOS-like neon glow cursor
                 const centerX = size * 0.2;
                 const centerY = size * 0.2;
-                const glowRadius = Math.max(8, size * 0.2);
-                const coreRadius = Math.max(3, size * 0.07);
+                const glowRadius = Math.max(10, size * 0.3);
+                const coreRadius = Math.max(4, size * 0.1);
 
-                const gradient = ctx.createRadialGradient(centerX, centerY, coreRadius * 0.2, centerX, centerY, glowRadius);
-                gradient.addColorStop(0, 'rgba(255,255,255,0.95)');
-                gradient.addColorStop(0.35, 'rgba(147,197,253,0.95)');
-                gradient.addColorStop(1, 'rgba(56,189,248,0)');
+                // Multi-layered radial gradient for deep glow
+                const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, glowRadius);
+                gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+                gradient.addColorStop(0.2, 'rgba(167, 139, 250, 0.9)'); // Purple/Indigo tint
+                gradient.addColorStop(0.5, 'rgba(99, 102, 241, 0.5)'); // Indigo
+                gradient.addColorStop(1, 'rgba(79, 70, 229, 0)');
+
                 ctx.fillStyle = gradient;
                 ctx.beginPath();
                 ctx.arc(centerX, centerY, glowRadius, 0, Math.PI * 2);
                 ctx.fill();
 
+                // Solid white core
                 ctx.fillStyle = '#ffffff';
                 ctx.beginPath();
                 ctx.arc(centerX, centerY, coreRadius, 0, Math.PI * 2);
@@ -274,44 +288,58 @@ export class CursorProcessor {
             }
 
             case 'high_contrast': {
-                const width = size * 0.78;
-                const height = size * 0.96;
+                // Vibrant, playful, highly visible arrow cursor
+                const width = size * 0.85;
+                const height = size * 1.05;
 
-                ctx.fillStyle = '#facc15';
-                ctx.beginPath();
-                ctx.moveTo(-2, -2);
-                ctx.lineTo(width * 0.5, height * 0.88);
-                ctx.lineTo(width * 0.56, height * 0.58);
-                ctx.lineTo(width * 0.86, height * 0.72);
-                ctx.lineTo(width * 0.96, height * 0.52);
-                ctx.lineTo(width * 0.64, height * 0.4);
-                ctx.lineTo(width * 0.9, height * 0.18);
-                ctx.closePath();
-                ctx.fill();
+                ctx.save();
+                // Add a subtle rotation to make it look dynamic
+                ctx.translate(size * 0.1, size * 0.1);
+                ctx.rotate(-5 * Math.PI / 180);
 
-                ctx.fillStyle = '#ffffff';
+                // Neon yellow/green fill
+                ctx.fillStyle = '#ccff00';
+
+                // Bold thick black stroke
                 ctx.strokeStyle = '#000000';
-                ctx.lineWidth = Math.max(2, size * 0.08);
+                ctx.lineWidth = Math.max(3, size * 0.12);
+                ctx.lineJoin = 'round';
+                ctx.lineCap = 'round';
+
                 ctx.beginPath();
                 ctx.moveTo(0, 0);
-                ctx.lineTo(width * 0.48, height * 0.82);
-                ctx.lineTo(width * 0.54, height * 0.55);
-                ctx.lineTo(width * 0.8, height * 0.68);
-                ctx.lineTo(width * 0.88, height * 0.52);
-                ctx.lineTo(width * 0.6, height * 0.4);
-                ctx.lineTo(width * 0.82, height * 0.2);
+                ctx.lineTo(width * 0.45, height * 0.85);
+                ctx.lineTo(width * 0.52, height * 0.55);
+                ctx.lineTo(width * 0.85, height * 0.65);
+                ctx.lineTo(width * 0.95, height * 0.45);
+                ctx.lineTo(width * 0.6, height * 0.35);
+                ctx.lineTo(width * 0.85, height * 0.15);
                 ctx.closePath();
+
                 ctx.fill();
                 ctx.stroke();
+
+                // Inner white accent line for 3D effect
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+                ctx.lineWidth = Math.max(1, size * 0.04);
+                ctx.beginPath();
+                ctx.moveTo(size * 0.05, size * 0.05);
+                ctx.lineTo(width * 0.42, height * 0.8);
+                ctx.stroke();
+
+                ctx.restore();
                 break;
             }
 
             default:
-                // Fallback circle if style is unknown
+                // Fallback elegant circle
                 ctx.fillStyle = '#ffffff';
+                ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+                ctx.lineWidth = 1.5;
                 ctx.beginPath();
-                ctx.arc(size * 0.2, size * 0.2, Math.max(5, size * 0.12), 0, Math.PI * 2);
+                ctx.arc(size * 0.2, size * 0.2, Math.max(6, size * 0.15), 0, Math.PI * 2);
                 ctx.fill();
+                ctx.stroke();
                 break;
         }
     }

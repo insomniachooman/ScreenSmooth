@@ -172,10 +172,9 @@ export class CursorSettings {
         const cursorStyle = this.settings.cursorStyle || 'classic';
         this.elements.preview.dataset.cursorStyle = cursorStyle;
 
-        // Update preview cursor size
-        // Assuming the preview contains an image or div representing the cursor
-        // We'll set the scale transform
-        this.elements.preview.style.transform = `scale(${this.settings.cursorSize})`;
+        // Update preview cursor size and handle specific rotations for styles
+        const extraTransform = cursorStyle === 'high_contrast' ? ' rotate(-5deg)' : '';
+        this.elements.preview.style.transform = `scale(${this.settings.cursorSize})${extraTransform}`;
     }
 
     // Public getter for current settings

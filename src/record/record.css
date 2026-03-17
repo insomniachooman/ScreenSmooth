@@ -508,6 +508,7 @@ body {
 /* Start Recording Section */
 .start-recording-section {
   text-align: center;
+  margin-top: -100px;
 }
 
 /* Bottom Actions - Subscription Management & Support */
@@ -3157,6 +3158,8 @@ body {
     background-repeat: no-repeat;
     background-position: center;
     box-shadow: none;
+    border: none;
+    background-color: transparent;
 }
 
 #cursor-preview[data-cursor-style="minimal_dot"] {
@@ -3164,28 +3167,34 @@ body {
     height: 18px;
     border-radius: 50%;
     background: #ffffff;
-    border: 2px solid rgba(0, 0, 0, 0.78);
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+    border: 3px solid rgba(15, 23, 42, 0.95);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+    background-image: none;
 }
 
 #cursor-preview[data-cursor-style="soft_glow"] {
     width: 18px;
     height: 18px;
     border-radius: 50%;
-    background: radial-gradient(circle at center, #ffffff 0 35%, #8bc6ff 36% 100%);
-    border: 1px solid rgba(255, 255, 255, 0.72);
+    background: #ffffff;
+    border: none;
     box-shadow:
-      0 0 0 2px rgba(56, 189, 248, 0.2),
-      0 0 12px rgba(56, 189, 248, 0.65);
+      0 0 0 4px rgba(167, 139, 250, 0.8),
+      0 0 16px 6px rgba(99, 102, 241, 0.5);
+    background-image: none;
 }
 
 #cursor-preview[data-cursor-style="high_contrast"] {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #ffffff;
-    border: 3px solid #000000;
-    box-shadow: 0 0 0 3px #facc15;
+    width: 24px;
+    height: 24px;
+    border-radius: 0;
+    background-color: transparent;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 3l10 18 1.5-6.5 7.5 2.5 2-4.5-8-2.5 5.5-4.5z' fill='%23ccff00' stroke='%23000000' stroke-width='2.5' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    box-shadow: none;
+    border: none;
 }
 
 /* Manage Subscription Button - Fixed bottom-right */

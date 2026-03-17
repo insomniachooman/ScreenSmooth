@@ -14,6 +14,12 @@ if (typeof window.ScreenSmoothContent !== 'undefined') {
             this.showCursor = true; // Default to showing cursor
             this.lastSelectionTime = 0; // Debounce for selection events
             this.selectionStartTime = 0;
+            this.lastTypingTime = 0;
+            this.boundMouseMove = null;
+            this.boundMouseDown = null;
+            this.boundMouseUp = null;
+            this.boundClick = null;
+            this.boundInput = null;
 
             this.initialize();
         }
@@ -77,11 +83,19 @@ if (typeof window.ScreenSmoothContent !== 'undefined') {
             // Create cursor tracker element
             this.createCursorTracker();
 
-            // Add mouse event listeners
-            document.addEventListener('mousemove', this.handleMouseMove.bind(this), { passive: true });
-            document.addEventListener('mousedown', this.handleMouseDown.bind(this), { passive: true });
-            document.addEventListener('mouseup', this.handleMouseUp.bind(this), { passive: true });
-            document.addEventListener('click', this.handleClick.bind(this), { passive: true });
+            // Store bound functions for proper removal
+            this.boundMouseMove = this.handleMouseMove.bind(this);
+            this.boundMouseDown = this.handleMouseDown.bind(this);
+            this.boundMouseUp = this.handleMouseUp.bind(this);
+            this.boundClick = this.handleClick.bind(this);
+            this.boundInput = this.handleInput.bind(this);
+
+            // Add mouse and input event listeners
+            document.addEventListener('mousemove', this.boundMouseMove, { passive: true });
+            document.addEventListener('mousedown', this.boundMouseDown, { passive: true });
+            document.addEventListener('mouseup', this.boundMouseUp, { passive: true });
+            document.addEventListener('click', this.boundClick, { passive: true });
+            document.addEventListener('input', this.boundInput, { passive: true });
         }
 
         stopCursorTracking() {
@@ -92,11 +106,20 @@ if (typeof window.ScreenSmoothContent !== 'undefined') {
             console.log('Stopping cursor tracking');
             this.isTrackingCursor = false;
 
-            // Remove event listeners
-            document.removeEventListener('mousemove', this.handleMouseMove.bind(this));
-            document.removeEventListener('mousedown', this.handleMouseDown.bind(this));
-            document.removeEventListener('mouseup', this.handleMouseUp.bind(this));
-            document.removeEventListener('click', this.handleClick.bind(this));
+            // Remove event listeners properly
+            if (this.boundMouseMove) {
+                document.removeEventListener('mousemove', this.boundMouseMove);
+                document.removeEventListener('mousedown', this.boundMouseDown);
+                document.removeEventListener('mouseup', this.boundMouseUp);
+                document.removeEventListener('click', this.boundClick);
+                document.removeEventListener('input', this.boundInput);
+            }
+
+            this.boundMouseMove = null;
+            this.boundMouseDown = null;
+            this.boundMouseUp = null;
+            this.boundClick = null;
+            this.boundInput = null;
 
             // Remove cursor tracker element
             this.removeCursorTracker();
@@ -301,6 +324,52 @@ if (typeof window.ScreenSmoothContent !== 'undefined') {
                 target: event.target.tagName,
                 timestamp: Date.now()
             });
+        }
+
+        handleInput(event) {
+            if (!this.isTrackingCursor || !this.isRecording) return;
+
+            const target = event.target;
+            if (!(target instanceof HTMLElement)) return;
+
+            const isTextarea = target.tagName === 'TEXTAREA';
+            const isContentEditable = target.isContentEditable;
+            let isTextEntryInput = false;
+
+            if (target.tagName === 'INPUT') {
+                const inputType = (target.getAttribute('type') || 'text').toLowerCase();
+                const textEntryInputTypes = ['text', 'search', 'email', 'password', 'tel', 'url', 'number'];
+                isTextEntryInput = textEntryInputTypes.includes(inputType);
+            }
+
+            if (isTextEntryInput || isTextarea || isContentEditable) {
+                const rect = target.getBoundingClientRect();
+                const now = Date.now();
+
+                // Debounce typing intent to avoid spamming (every 1.5 seconds max)
+                if (!this.lastTypingTime || (now - this.lastTypingTime) > 1500) {
+                    this.lastTypingTime = now;
+
+                    this.sendCursorData('typing', {
+                        x: rect.left + (rect.width / 2),
+                        y: rect.top + (rect.height / 2),
+                        width: rect.width,
+                        height: rect.height,
+                        timestamp: now,
+                        viewportWidth: window.innerWidth,
+                        viewportHeight: window.innerHeight,
+                        screenWidth: window.screen.width,
+                        screenHeight: window.screen.height,
+                        scrollX: window.scrollX || window.pageXOffset || 0,
+                        scrollY: window.scrollY || window.pageYOffset || 0
+                    });
+
+                    console.log('[AutoZoom] TYPING DETECTED!', {
+                        target: target.tagName,
+                        timestamp: now
+                    });
+                }
+            }
         }
 
         resetZoom() {
